@@ -16,6 +16,8 @@ typedef struct
 
 typedef struct
 {
+	int w;
+	int h;
 	SDL_Texture* texture;
 } SpriteComponent_t;
 
