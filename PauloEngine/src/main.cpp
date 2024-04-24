@@ -1,22 +1,11 @@
-#include "platform.h"
+#include "game.h"
 
 extern bool isRunning;
 
 int main(int argc, char* argv[])
 {
 	InitializeWindow(640, 480, "Hello world!");
-
-	while (isRunning)
-	{
-		if (WindowShouldClose())
-		{
-			isRunning = false;
-		}
-
-		Tick();
-		Render();
-	}
-
+	Run();
 	DestroyWindow();
 	return 0;
 }

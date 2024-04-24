@@ -12,3 +12,5 @@ bool WindowShouldClose();
 
 void Tick();
 void Render();
+
+void Run();

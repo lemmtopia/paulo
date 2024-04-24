@@ -1,11 +1,15 @@
-#include "platform.h"
+#include "game.h"
 #include <iostream>
+
+#include "ECS/ECS.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
 bool isRunning = false;
 
 int lastTicks;
+
+ECS_t ecs;
 
 void InitializeWindow(int width, int height, std::string title)
 {
@@ -62,6 +66,29 @@ void Tick()
 
 void Render()
 {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+	SystemDraw(ecs, renderer);
+
 	SDL_RenderPresent(renderer);
+}
+
+void Run()
+{
+	ecs = InitECS(3);
+
+	while (isRunning)
+	{
+		if (WindowShouldClose())
+		{
+			isRunning = false;
+		}
+
+		Tick();
+		Render();
+	}
+
+	DestroyECS(ecs);
 }
