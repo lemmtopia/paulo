@@ -2,12 +2,18 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using System.Collections.Generic;
+using System;
+
 namespace paulo;
 
 public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+
+    Texture2D lisaSheet;
+    List<Entity> entities = new List<Entity>();
 
     public Game1()
     {
@@ -18,7 +24,12 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
+        Entity e = new Entity();
+        Transform t = new Transform(new Vector2(20, 30));
+        e.AddComponent(t);
+        e.AddComponent(new RigidBody(t, new Vector2(20, 10)));
+        e.AddComponent(new Sprite(new Rectangle(0, 0, 19, 25)));
+        entities.Add(e);
 
         base.Initialize();
     }
@@ -27,7 +38,7 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // TODO: use this.Content to load your game content here
+        lisaSheet = Content.Load<Texture2D>("lisasheet");
     }
 
     protected override void Update(GameTime gameTime)
@@ -35,7 +46,10 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
+        foreach (Entity entity in entities)
+        {
+            entity.Update(gameTime);
+        }
 
         base.Update(gameTime);
     }
@@ -44,7 +58,19 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        foreach (Entity entity in entities)
+        {
+            Transform transform = (Transform)entity.GetComponent<Transform>();
+            Sprite sprite = (Sprite)entity.GetComponent<Sprite>();
+
+            if (transform != null && sprite != null)
+            {
+                Rectangle dest = new Rectangle((int)transform.Position.X, (int)transform.Position.Y, sprite.rectangle.Width, sprite.rectangle.Height);
+                _spriteBatch.Draw(lisaSheet, dest, sprite.rectangle, Color.White);
+            }
+        }
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
