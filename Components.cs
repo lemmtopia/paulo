@@ -59,3 +59,43 @@ public class Sprite : Component
         return; 
     }
 }
+
+public class Animation : Component
+{
+    Sprite sprite;
+    public float frame;
+    public float speed;
+
+    public int numFrames;
+    public int start;
+    public bool loop;
+
+    public Animation(Sprite sprite, float speed, int start, int numFrames, bool loop)
+    {
+        this.sprite = sprite;
+        this.speed = speed;
+        this.numFrames = numFrames;
+        this.start = start;
+        this.loop = loop;
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        frame += speed * dt;
+
+        if ((int)frame >= start + numFrames)
+        {
+            if (loop) 
+            {
+                frame = start;
+            }
+            else
+            {
+                frame = start + numFrames;
+            }
+        }
+
+        sprite.rectangle.X = (int)frame * sprite.rectangle.Width;
+    }
+}

@@ -12,6 +12,8 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+    RenderTarget2D target;
+
     Texture2D lisaSheet;
     List<Entity> entities = new List<Entity>();
 
@@ -24,12 +26,31 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
+        _graphics.PreferredBackBufferWidth = 960;
+        _graphics.PreferredBackBufferHeight = 540;
+        _graphics.ApplyChanges();
+
+        target = new RenderTarget2D(GraphicsDevice, 320, 180);
+
+        /* Adding entities */
+
         Entity e = new Entity();
         Transform t = new Transform(new Vector2(20, 30));
         e.AddComponent(t);
         e.AddComponent(new RigidBody(t, new Vector2(20, 10)));
         e.AddComponent(new Sprite(new Rectangle(0, 0, 19, 25)));
+
+        Sprite s = (Sprite)e.GetComponent<Sprite>();
+        e.AddComponent(new Animation(s, 8, 1, 6, true));
+
         entities.Add(e);
+
+        Entity e2 = new Entity();
+        Transform t2 = new Transform(new Vector2(0, 30));
+        e2.AddComponent(t2);
+        e2.AddComponent(new RigidBody(t2, Vector2.Zero));
+        e2.AddComponent(new Sprite(new Rectangle(0, 0, 19, 25)));
+        entities.Add(e2);
 
         base.Initialize();
     }
@@ -46,8 +67,10 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        // Simple loop, the components handle the rest
         foreach (Entity entity in entities)
         {
+            // This updates all the components inside this entity btw
             entity.Update(gameTime);
         }
 
@@ -56,11 +79,13 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
+        /* RenderTarget makes virtual resolution possible */
+        GraphicsDevice.SetRenderTarget(target);
         GraphicsDevice.Clear(Color.CornflowerBlue);
-
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         foreach (Entity entity in entities)
         {
+            // This is kinda cool ngl
             Transform transform = (Transform)entity.GetComponent<Transform>();
             Sprite sprite = (Sprite)entity.GetComponent<Sprite>();
 
@@ -70,6 +95,12 @@ public class Game1 : Game
                 _spriteBatch.Draw(lisaSheet, dest, sprite.rectangle, Color.White);
             }
         }
+        _spriteBatch.End();
+
+        // Render the virtual resolution
+        GraphicsDevice.SetRenderTarget(null);
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        _spriteBatch.Draw(target, new Rectangle(0, 0, 960, 540), Color.White);
         _spriteBatch.End();
 
         base.Draw(gameTime);
