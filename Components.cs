@@ -47,10 +47,16 @@ public class RigidBody : Component
 
 public class Sprite : Component
 {
+    public Texture2D texture;
     public Rectangle rectangle;
+    public bool flip = false;
+    public float rotation = 0;
+    public Vector2 origin = Vector2.Zero;
+    public Vector2 scale = Vector2.One;
 
-    public Sprite(Rectangle rect)
+    public Sprite(Texture2D texture, Rectangle rect)
     {
+        this.texture = texture;
         rectangle = rect;
     }
 
